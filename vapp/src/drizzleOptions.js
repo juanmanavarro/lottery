@@ -1,5 +1,4 @@
-import TestToken from './contracts/TestToken.json';
-import TestCrowdsale from './contracts/TestCrowdsale.json';
+import Lottery from './contracts/ChristmasLottery.json';
 
 const options = {
   web3: {
@@ -9,10 +8,10 @@ const options = {
       url: 'ws://127.0.0.1:7545'
     }
   },
-  contracts: [TestToken, TestCrowdsale],
-  events: {
-    TestCrowdsale: ['TokensPurchased']
-  },
+  contracts: [Lottery],
+  // events: {
+  //   TestCrowdsale: ['TokensPurchased']
+  // },
   polls: {
     accounts: 15000
   }
