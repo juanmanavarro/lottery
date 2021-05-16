@@ -11,6 +11,7 @@
   "dependencies": {
     "@drizzle/store": "^1.5.0",
     "@drizzle/vue-plugin": "^0.1.0",
+    "ethers": "^5.1.4",
     "node-sass": "^6.0.0",
     "prettier": "^1.18.2",
     "sass-loader": "^10",
@@ -26,10 +27,13 @@
     "@vue/cli-service": "^3.8.0",
     "@vue/eslint-config-prettier": "^4.0.1",
     "@vue/test-utils": "^1.2.0",
+    "autoprefixer": "^9.8.6",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "flush-promises": "^1.0.2",
+    "postcss": "^7.0.35",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.2",
     "vue-jest": "^3.0.7",
     "vue-template-compiler": "^2.6.10"
   }
