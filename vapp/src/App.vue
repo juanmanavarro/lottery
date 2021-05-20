@@ -1,7 +1,7 @@
 <template>
 <div>
   <div class="flex justify-end">
-    <button v-if="account">
+    <button v-if="account" @click="disconnectWallet">
       {{ balance }} ETH
     </button>
     <button v-else @click="connectWallet">
@@ -49,10 +49,11 @@ export default {
     return {
       number: '',
       numbers: [],
-      eth: window.ethereum,
       account: null,
+      accounts: [],
       balance: 0,
       provider: null,
+      connected: false,
     }
   },
   computed: {
@@ -62,7 +63,7 @@ export default {
       return this.number.length === 5 && !this.numbers.includes(this.number);
     },
     isConnected() {
-      return !!this.account;
+      return Boolean(this.account);
     },
   },
   methods: {
@@ -72,19 +73,29 @@ export default {
     },
     async connectWallet() {
       try {
-        await this.eth.request({ method: 'eth_requestAccounts' }); // TODO to ethers???
-        this.account = (await this.provider.listAccounts())[0];
-        this.balance = ethers.utils.formatEther((await this.provider.getBalance(this.account)).toString());
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        this.account = accounts[0];
+        this.balance = ethers.utils.formatEther(await window.ethereum.request({
+          method: 'eth_getBalance',
+          params: [this.account],
+        }));
       } catch (error) {
         console.error(error);
       }
     },
+    async disconnectWallet() {
+      this.account = null;
+    },
   },
-  async mounted() {
-    this.provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const signer = this.provider.getSigner()
-    this.account = (await this.provider.listAccounts())[0];
-    this.balance = ethers.utils.formatEther((await this.provider.getBalance(this.account)).toString());
+  mounted() {
+    this.connectWallet();
+
+    window.ethereum.on('chainChanged', async () => {
+      this.balance = ethers.utils.formatEther(await window.ethereum.request({
+        method: 'eth_getBalance',
+        params: [this.account],
+      }));
+    });
   },
 }
 </script>
