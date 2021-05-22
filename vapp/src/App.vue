@@ -15,6 +15,7 @@
         <h2 class="-mt-3">{{ totalBalance }} ETH</h2>
       </div>
       <div class="card">
+        <pre>{{ purchasedNumbers }}</pre>
         <h4>Search number</h4>
         <input class="inline-block" v-model="number" type="text" maxlength="5">
         <button @click="add" :disabled="!canAdd">Add</button>
@@ -56,6 +57,7 @@ export default {
       connected: false,
       contract: null,
       totalBalance: 0,
+      userNumbers: [],
     }
   },
   computed: {
@@ -66,6 +68,9 @@ export default {
     },
     isConnected() {
       return Boolean(this.account);
+    },
+    purchasedNumbers() {
+      return this.userNumbers.map(n => n.toString());
     },
   },
   methods: {
@@ -96,6 +101,7 @@ export default {
         await res.wait();
         this.totalBalance = ethers.utils.formatEther(await this.contract.getTotalBalance());
         this.numbers = [];
+        this.userNumbers = await this.contract.getUserNumbers();
       } catch (error) {
         console.error('ERROR', error);
       }
@@ -105,11 +111,12 @@ export default {
     this.connectWallet();
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum);
-    const address = '0x37d97Bc185142F49C75358642FbCBd7f258fc263';
+    const address = '0x37F2FEbE297e78De6b32297C210D492681cC2eBe';
     const daiAbi = [
       "function maxNumber() view returns (uint)",
       "function getTotalBalance() public view returns (uint)",
       "function purchase(uint[] memory _numbers) public payable",
+      "function getUserNumbers() public view returns (uint[] memory)",
     ];
     const signer = this.provider.getSigner();
 
@@ -118,6 +125,7 @@ export default {
     // // The Contract object
     this.contract = new ethers.Contract(address, daiAbi, signer);
     this.totalBalance = ethers.utils.formatEther(await this.contract.getTotalBalance());
+    this.userNumbers = await this.contract.getUserNumbers();
 
 
     // window.ethereum.on('chainChanged', async () => {

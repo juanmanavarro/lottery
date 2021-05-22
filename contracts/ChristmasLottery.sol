@@ -5,7 +5,8 @@ contract ChristmasLottery {
     uint32 public maxNumber;
     uint public price;
 
-    mapping(uint => address payable) public userNumbers;
+    mapping(address => uint[]) public userNumbers;
+    mapping(uint => bool) purchasedNumbers;
 
     constructor(uint _price) {
         maxNumber = 99999;
@@ -23,23 +24,13 @@ contract ChristmasLottery {
             uint _number = _numbers[index];
 
             require(_number <= maxNumber, 'Number out of bounds!');
-            require(userNumbers[_number] == address(0x0), 'Number is not available!');
+            require(!purchasedNumbers[_number], 'Number is not available!');
 
-            userNumbers[_number] = payable(msg.sender);
+            userNumbers[msg.sender].push(_number);
+            purchasedNumbers[_number] = true;
         }
 
         emit NumbersPurchased(msg.sender, _numbers);
-    }
-
-    function rewardWinner(uint _number) public {
-        address payable winner = userNumbers[_number];
-        uint totalBalance = address(this).balance;
-        uint comission = totalBalance / 10;
-        uint prize = totalBalance - comission;
-
-        winner.transfer(prize);
-
-        emit WinnerRewarded(winner, _number, prize);
     }
 
     function getTotalBalance() public view returns (uint) {
