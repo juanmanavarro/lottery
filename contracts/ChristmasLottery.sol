@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 contract ChristmasLottery {
-    uint public maxNumber;
+    uint32 public maxNumber;
     uint public price;
 
     mapping(uint => address payable) public userNumbers;
@@ -40,5 +40,9 @@ contract ChristmasLottery {
         winner.transfer(prize);
 
         emit WinnerRewarded(winner, _number, prize);
+    }
+
+    function getTotalBalance() public view returns (uint) {
+        return address(this).balance;
     }
 }

@@ -12,7 +12,7 @@
     <div v-if="isConnected" id="app">
       <div class="card">
         <h4>Total</h4>
-        <h2 class="-mt-3">56,444.56</h2>
+        <h2 class="-mt-3">{{ totalBalance }} ETH</h2>
       </div>
       <div class="card">
         <h4>Search number</h4>
@@ -27,7 +27,7 @@
           >{{ num }}</code>
         </div>
         <div class="mt-10" v-if="numbers.length">
-          <button>Purchase</button>
+          <button @click="purchase">Purchase</button>
         </div>
       </div>
     </div>
@@ -54,6 +54,8 @@ export default {
       balance: 0,
       provider: null,
       connected: false,
+      contract: null,
+      totalBalance: 0,
     }
   },
   computed: {
@@ -86,16 +88,46 @@ export default {
     async disconnectWallet() {
       this.account = null;
     },
+    async purchase() {
+      try {
+        const res = await this.contract.functions.purchase(this.numbers, {
+          value: ethers.utils.parseEther('0.001').mul(this.numbers.length),
+        });
+        await res.wait();
+        this.totalBalance = ethers.utils.formatEther(await this.contract.getTotalBalance());
+        this.numbers = [];
+      } catch (error) {
+        console.error('ERROR', error);
+      }
+    },
   },
-  mounted() {
+  async mounted() {
     this.connectWallet();
 
-    window.ethereum.on('chainChanged', async () => {
-      this.balance = ethers.utils.formatEther(await window.ethereum.request({
-        method: 'eth_getBalance',
-        params: [this.account],
-      }));
-    });
+    this.provider = new ethers.providers.Web3Provider(window.ethereum);
+    const address = '0x37d97Bc185142F49C75358642FbCBd7f258fc263';
+    const daiAbi = [
+      "function maxNumber() view returns (uint)",
+      "function getTotalBalance() public view returns (uint)",
+      "function purchase(uint[] memory _numbers) public payable",
+    ];
+    const signer = this.provider.getSigner();
+
+
+
+    // // The Contract object
+    this.contract = new ethers.Contract(address, daiAbi, signer);
+    this.totalBalance = ethers.utils.formatEther(await this.contract.getTotalBalance());
+
+
+    // window.ethereum.on('chainChanged', async () => {
+    //   const res = await window.ethereum.request({
+    //     method: 'eth_getBalance',
+    //     params: [this.account],
+    //   });
+    //   console.log(res);
+    //   // this.balance = ethers.utils.formatEther();
+    // });
   },
 }
 </script>
