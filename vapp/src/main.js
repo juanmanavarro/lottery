@@ -10,7 +10,7 @@ import Toasted from 'vue-toasted';
 Vue.config.productionTip = false;
 Vue.use(Toasted, {
   theme: 'toasted-primary',
-  position: 'top-left',
+  position: 'bottom-right',
   duration : 5000
 });
 

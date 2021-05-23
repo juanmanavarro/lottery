@@ -8,7 +8,10 @@
       <span>Connect wallet</span>
     </button>
   </div>
-  <div style="max-width:800px" class="pt-40 mx-auto">
+  <div style="max-width:800px" class="mx-auto mt-20">
+    <h1>Loteria de Navidad Dapp</h1>
+  </div>
+  <div style="max-width:800px" class="pt-20 mx-auto">
     <div v-if="isConnected" id="app">
       <div class="card">
         <h4>Total</h4>
@@ -33,7 +36,15 @@
             </div>
           </div>
           <div class="w-1/2">
-            <pre>{{ purchasedNumbers }}</pre>
+            <h3>Your numbers</h3>
+            <div class="flex flex-wrap">
+              <code
+                v-for="num in purchasedNumbers"
+                :key="num"
+                class="number"
+                :class="{ 'border-red-500': numbers.includes(num) }"
+              >{{ num }}</code>
+            </div>
           </div>
         </div>
       </div>
