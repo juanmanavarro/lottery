@@ -47,8 +47,8 @@
 </template>
 
 <script>
-// import { mapState } from 'vuex';
 import { ethers } from "ethers";
+import contract from './contract';
 
 export default {
   name: 'app',
@@ -57,18 +57,13 @@ export default {
       number: '',
       numbers: [],
       account: null,
-      accounts: [],
       balance: 0,
-      provider: null,
-      connected: false,
-      contract: null,
+      contract: contract,
       totalBalance: 0,
       userNumbers: [],
     }
   },
   computed: {
-    // ...mapGetters('drizzle', ['isDrizzleInitialized']),
-    // ...mapState('accounts', ['activeAccount', 'activeBalance']),
     canAdd() {
       return this.number.length === 5 && !this.numbers.includes(this.number);
     },
@@ -92,6 +87,8 @@ export default {
           method: 'eth_getBalance',
           params: [this.account],
         }));
+        this.totalBalance = ethers.utils.formatEther(await this.contract.getTotalBalance());
+        this.userNumbers = await this.contract.getUserNumbers();
       } catch (error) {
         console.error(error);
       }
@@ -114,35 +111,6 @@ export default {
       }
     },
   },
-  async mounted() {
-    this.connectWallet();
-
-    this.provider = new ethers.providers.Web3Provider(window.ethereum);
-    const address = '0x4D21ab42c0540d23f87dc622A680f489f1e18BD1';
-    const daiAbi = [
-      "function maxNumber() view returns (uint)",
-      "function getTotalBalance() public view returns (uint)",
-      "function purchase(uint[] memory _numbers) public payable",
-      "function getUserNumbers() public view returns (uint[] memory)",
-    ];
-    const signer = this.provider.getSigner();
-
-
-
-    // // The Contract object
-    this.contract = new ethers.Contract(address, daiAbi, signer);
-    this.totalBalance = ethers.utils.formatEther(await this.contract.getTotalBalance());
-    this.userNumbers = await this.contract.getUserNumbers();
-
-
-    // window.ethereum.on('chainChanged', async () => {
-    //   const res = await window.ethereum.request({
-    //     method: 'eth_getBalance',
-    //     params: [this.account],
-    //   });
-    //   console.log(res);
-    //   // this.balance = ethers.utils.formatEther();
-    // });
-  },
+  async mounted() { this.connectWallet() },
 }
 </script>
