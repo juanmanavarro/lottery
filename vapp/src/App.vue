@@ -15,20 +15,26 @@
         <h2 class="-mt-3">{{ totalBalance }} ETH</h2>
       </div>
       <div class="card">
-        <pre>{{ purchasedNumbers }}</pre>
-        <h4>Search number</h4>
-        <input class="inline-block" v-model="number" type="text" maxlength="5">
-        <button @click="add" :disabled="!canAdd">Add</button>
-        <div v-if="numbers.length" class="mt-10">
-          <code
-            v-for="num in numbers"
-            :key="num"
-            class="number"
-            :class="{ 'border-red-500': numbers.includes(num) }"
-          >{{ num }}</code>
-        </div>
-        <div class="mt-10" v-if="numbers.length">
-          <button @click="purchase">Purchase</button>
+        <div class="flex">
+          <div class="w-1/2">
+            <h4>Search number</h4>
+            <input class="inline-block" v-model="number" type="text" maxlength="5">
+            <button @click="add" :disabled="!canAdd">Add</button>
+            <div v-if="numbers.length" class="mt-10">
+              <code
+                v-for="num in numbers"
+                :key="num"
+                class="number"
+                :class="{ 'border-red-500': numbers.includes(num) }"
+              >{{ num }}</code>
+            </div>
+            <div class="mt-10" v-if="numbers.length">
+              <button @click="purchase">Purchase</button>
+            </div>
+          </div>
+          <div class="w-1/2">
+            <pre>{{ purchasedNumbers }}</pre>
+          </div>
         </div>
       </div>
     </div>
@@ -102,6 +108,7 @@ export default {
         this.totalBalance = ethers.utils.formatEther(await this.contract.getTotalBalance());
         this.numbers = [];
         this.userNumbers = await this.contract.getUserNumbers();
+        this.$toasted.show('Purchase successful!', {fitToScreen: true});
       } catch (error) {
         console.error('ERROR', error);
       }
@@ -111,7 +118,7 @@ export default {
     this.connectWallet();
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum);
-    const address = '0x37F2FEbE297e78De6b32297C210D492681cC2eBe';
+    const address = '0x4D21ab42c0540d23f87dc622A680f489f1e18BD1';
     const daiAbi = [
       "function maxNumber() view returns (uint)",
       "function getTotalBalance() public view returns (uint)",

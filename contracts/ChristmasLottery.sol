@@ -4,13 +4,17 @@ pragma solidity ^0.8.0;
 contract ChristmasLottery {
     uint32 public maxNumber;
     uint public price;
+    address owner;
 
     mapping(address => uint[]) public userNumbers;
+    mapping(uint => address payable) numberUser;
     mapping(uint => bool) purchasedNumbers;
 
     constructor(uint _price) {
         maxNumber = 99999;
         price = _price;
+
+        owner = msg.sender;
     }
 
     event NumbersPurchased(address purchaser, uint[] numbers);
@@ -27,10 +31,25 @@ contract ChristmasLottery {
             require(!purchasedNumbers[_number], 'Number is not available!');
 
             userNumbers[msg.sender].push(_number);
+            numberUser[_number] = payable(msg.sender);
             purchasedNumbers[_number] = true;
         }
 
         emit NumbersPurchased(msg.sender, _numbers);
+    }
+
+    function rewardWinner(uint _number) public {
+        require(owner == msg.sender, 'Forbidden!');
+        address payable winner = numberUser[_number];
+        uint totalBalance = address(this).balance;
+
+        winner.transfer(totalBalance);
+
+        emit WinnerRewarded(winner, _number, totalBalance);
+    }
+
+    function getUserNumbers() public view returns (uint[] memory) {
+        return userNumbers[msg.sender];
     }
 
     function getTotalBalance() public view returns (uint) {

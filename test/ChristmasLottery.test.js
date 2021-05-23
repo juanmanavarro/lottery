@@ -10,7 +10,7 @@ contract('ChristmasLottery', accounts => {
     assert.equal(await contract.maxNumber(), 99999);
   });
 
-  it('user has purchased numbers', async () => {
+  it('allow purchase numbers', async () => {
     const contract = await ChristmasLottery.new(price);
     const numbers = ['99998', '99999'];
     await contract.purchase(numbers, { value: price.mul(numbers.length) });
@@ -19,7 +19,7 @@ contract('ChristmasLottery', accounts => {
     assert.deepEqual(userNumbers, numbers);
   });
 
-  it('users cant purchase a number if is already purchased', async () => {
+  it('not allow purchase a number if it\'s already purchased', async () => {
     const contract = await ChristmasLottery.new(price);
 
     const numbers = ['33333'];
@@ -32,5 +32,7 @@ contract('ChristmasLottery', accounts => {
       assert.ok(error instanceof Error);
     }
   });
+
+  // TODO rewardWinner tests
 
 });
