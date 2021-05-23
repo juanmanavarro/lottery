@@ -21,7 +21,14 @@
         <div class="flex">
           <div class="w-1/2">
             <h4>Search number</h4>
-            <input class="inline-block" v-model="number" type="text" maxlength="5">
+            <input
+              class="inline-block"
+              v-model="number"
+              type="text"
+              maxlength="5"
+              @keyup="checkNumber"
+            >
+            <span v-if="!available" class="text-red-500 mb-2 inline-block">This number is not available. Sorry 😔</span>
             <button @click="add" :disabled="!canAdd">Add</button>
             <div v-if="numbers.length" class="mt-10">
               <code
@@ -36,14 +43,16 @@
             </div>
           </div>
           <div class="w-1/2">
-            <h3>Your numbers</h3>
-            <div class="flex flex-wrap">
-              <code
-                v-for="num in purchasedNumbers"
-                :key="num"
-                class="number"
-                :class="{ 'border-red-500': numbers.includes(num) }"
-              >{{ num }}</code>
+            <div v-if="purchasedNumbers && purchasedNumbers.length">
+              <h3>Your numbers</h3>
+              <div class="flex flex-wrap">
+                <code
+                  v-for="num in purchasedNumbers"
+                  :key="num"
+                  class="number"
+                  :class="{ 'border-red-500': numbers.includes(num) }"
+                >{{ num }}</code>
+              </div>
             </div>
           </div>
         </div>
@@ -51,7 +60,7 @@
     </div>
 
     <div v-else>
-      Check metamask
+      Connect wallet, please.
     </div>
   </div>
 </div>
@@ -72,11 +81,12 @@ export default {
       contract: contract,
       totalBalance: 0,
       userNumbers: [],
+      available: true,
     }
   },
   computed: {
     canAdd() {
-      return this.number.length === 5 && !this.numbers.includes(this.number);
+      return  this.available && this.number.length === 5 && !this.numbers.includes(this.number);
     },
     isConnected() {
       return Boolean(this.account);
@@ -86,6 +96,11 @@ export default {
     },
   },
   methods: {
+    async checkNumber() {
+      this.number.length === 5 ?
+        this.available = await this.contract.isNumberAvailable(this.number) :
+        this.available = true;
+    },
     add() {
       this.numbers.push(this.number)
       this.number = '';

@@ -55,4 +55,8 @@ contract ChristmasLottery {
     function getTotalBalance() public view returns (uint) {
         return address(this).balance;
     }
+
+    function isNumberAvailable(uint _number) public view returns (bool) {
+        return numberUser[_number] == address(0x0);
+    }
 }
